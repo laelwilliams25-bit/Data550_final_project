@@ -1,0 +1,152 @@
+---
+title: "Final Project Proposal"
+author: "La'el Williams"
+date: "2026-10-01"
+output: html_document
+---
+
+## Introduction
+
+The data set, titled Screen Time vs. Mental Health, includes data from 4,810 Swedish adolescents ages 12–16 who participated in a prospective, school-based study in Stockholm. The data set includes measures of screen time collected at baseline, sleep measured three months later, and depression measured twelve months later using the Beck Depression Inventory-II (BDI-II). This R Markdown report will use descriptive statistics and visualizations to explore the relationships among screen time, sleep, and depression among participants. The primary objective is to examine whether greater screen time is associated with higher levels of depressive symptoms and to explore how sleep duration and sleep quality relate to depression.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+getwd()
+list.files()
+library(tidyverse)
+st_mh <- readRDS(
+  file = here::here("Data clean/data_clean.rds")
+)
+```
+## Descriptive Statistics 
+```{r descriptive-table 1, echo=FALSE}
+summary_table <- st_mh %>%
+  summarise("Sample Size" = n(),
+    "Mean Screen Hours" = mean(est_leisure_screen_hours),
+    "SD Screen Hours" = sd(est_leisure_screen_hours),
+    "Mean BDI Score" = mean(bdi_total),
+    "SD BDI Score" = sd(bdi_total),
+    "Mean Sleep Quality" = mean(sleep_quality_index, na.rm = TRUE),
+    "SD Sleep Quality" = sd(sleep_quality_index, na.rm = TRUE),
+    "Mean Sleep Hours" = mean(avg_sleep_hours, na.rm = TRUE),
+    "SD Sleep Hours" = sd(avg_sleep_hours, na.rm = TRUE),
+    "Number Depressed" = sum(depressed == 1),
+    "Percent Depressed" = mean(depressed == 1, na.rm = TRUE) * 100
+  )
+knitr::kable(summary_table,
+  caption = "Table 1. Overall Descriptive Statistics")
+```
+Table 1 presents descriptive statistics for the overall study sample, including estimated leisure screen time, BDI-II depression scores, sleep quality, and average sleep duration. The table also includes the number and percentage of participants classified as depressed.
+
+```{r descriptive-table 2, echo=FALSE}
+summary_by_sex <- st_mh %>%
+  group_by(sex) %>%
+  summarise("n" = n(),
+    "Mean Screen Hours" = mean(est_leisure_screen_hours, na.rm = TRUE),
+    "SD Screen Hours" = sd(est_leisure_screen_hours, na.rm = TRUE),
+    "Mean BDI Score" = mean(bdi_total, na.rm = TRUE),
+    "SD BDI Score" = sd(bdi_total, na.rm = TRUE),
+    "Mean Sleep Quality" = mean(sleep_quality_index, na.rm = TRUE),
+    "SD Sleep Quality" = sd(sleep_quality_index, na.rm = TRUE),
+    "Mean Sleep Hours" = mean(avg_sleep_hours, na.rm = TRUE),
+    "SD Sleep Hours" = sd(avg_sleep_hours, na.rm = TRUE),
+    "Number Depressed" = sum(depressed == 1, na.rm = TRUE),
+    "Percent Depressed" = mean(depressed == 1, na.rm = TRUE) * 100
+  )
+knitr::kable(summary_by_sex,
+  caption = "Table 2. Descriptive Statistics by Sex")
+```
+Table 2 presents the same descriptive statistics stratified by sex, allowing for comparisons between boys and girls.
+
+```{r descriptive-table 3, echo=FALSE}
+summary_by_depression <- st_mh %>%
+  mutate( Depression_Status = ifelse(
+      depressed == 1,
+      "Depressed",
+      "Not Depressed")
+    ) %>%
+  group_by(Depression_Status) %>%
+  summarise("n" = n(),
+    "Mean Screen Hours" = mean(est_leisure_screen_hours, na.rm = TRUE),
+    "SD Screen Hours" = sd(est_leisure_screen_hours, na.rm = TRUE),
+    "Mean BDI Score" = mean(bdi_total, na.rm = TRUE),
+    "SD BDI Score" = sd(bdi_total, na.rm = TRUE),
+    "Mean Sleep Quality" = mean(sleep_quality_index, na.rm = TRUE),
+    "SD Sleep Quality" = sd(sleep_quality_index, na.rm = TRUE),
+    "Mean Sleep Hours" = mean(avg_sleep_hours, na.rm = TRUE),
+    "SD Sleep Hours" = sd(avg_sleep_hours, na.rm = TRUE),
+  )
+
+knitr::kable(
+  summary_by_depression,
+  caption = "Table 3. Descriptive Statistics by Depression Status")
+```
+Table 3 presents descriptive statistics stratified by depression status. It compares estimated leisure screen time, sleep quality, and average sleep duration between participants classified as depressed and not depressed.
+
+## Figures
+```{r figure 1, echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(st_mh, aes(x = est_leisure_screen_hours, y = bdi_total)) +
+  geom_jitter(alpha = 0.3, width = 0.1) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Figure 1. Screen Time and Depressive Symptoms",
+    x = "Estimated Leisure Screen Time (Hours)",
+    y = "BDI-II Total Score"
+  ) +
+  theme_minimal()
+```
+
+
+Figure 1 displays the relationship between estimated leisure screen time and BDI-II depression scores.
+```{r figure 2, echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(st_mh, aes(
+  x = factor(depressed),
+  y = est_leisure_screen_hours
+)) +
+  geom_boxplot() +
+  scale_x_discrete(
+    labels = c(
+      "0" = "Not Depressed",
+      "1" = "Depressed"
+    )
+  ) +
+  labs(
+    title = "Figure 2. Screen Time by Depression Status",
+    x = "Depression Status",
+    y = "Estimated Leisure Screen Time (Hours)"
+  ) +
+  theme_minimal()
+```
+
+
+Figure 2 compares estimated leisure screen time between participants classified as depressed and not depressed.
+
+```{r figure 3, echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(st_mh, aes(x = avg_sleep_hours, y = bdi_total)) +
+  geom_jitter(alpha = 0.3, width = 0.1) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Figure 3. Average Sleep Duration and Depressive Symptoms",
+    x = "Average Sleep Hours",
+    y = "BDI-II Total Score"
+  ) +
+  theme_minimal()
+```
+
+
+Figure 3 examines the relationship between average sleep duration and BDI-II depression scores. 
+
+```{r figure 4, echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(st_mh, aes(x = sleep_quality_index, y = bdi_total)) +
+  geom_jitter(alpha = 0.3, width = 0.1) +
+  geom_smooth(method = "lm", se = TRUE) +
+  labs(
+    title = "Figure 4. Sleep Quality and Depressive Symptoms",
+    x = "Sleep Quality Index",
+    y = "BDI-II Total Score"
+  ) +
+  theme_minimal()
+```
+
+
+Figure 4 examines the relationship between sleep quality and BDI-II depression scores. 

@@ -1,0 +1,91 @@
+---
+title: "Final Project 2"
+author: "La'el Williams"
+date: "`r Sys.Date()`"
+output: html_document
+---
+## Introduction
+
+The data set, titled Screen Time vs. Mental Health, includes data from 4,810 Swedish adolescents ages 12–16 who participated in a prospective, school-based study in Stockholm. The data set includes measures of screen time collected at baseline, sleep measured three months later, and depression measured twelve months later using the Beck Depression Inventory-II (BDI-II). This R Markdown report will use descriptive statistics and visualizations to explore the relationships among screen time, sleep, and depression among participants. The primary objective is to examine whether greater screen time is associated with higher levels of depressive symptoms and to explore how sleep duration and sleep quality relate to depression.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+here::i_am(
+  "Final Project 2.Rmd"
+)
+```
+
+## Descriptive Statistics 
+```{r, load table 1, echo=FALSE}
+summary_table <- readRDS(
+  here::here("tables/summary_table.rds")
+)
+knitr::kable(summary_table,
+  caption = "Table 1. Overall Descriptive Statistics")
+
+```
+Table 1 presents descriptive statistics for the overall study sample, including estimated leisure screen time, BDI-II depression scores, sleep quality, and average sleep duration. The table also includes the number and percentage of participants classified as depressed.
+
+```{r, load table 2, echo=FALSE}
+summary_by_sex <- readRDS(
+  here::here("tables/summary_by_sex.rds")
+)
+knitr::kable(summary_by_sex,
+  caption = "Table 2. Descriptive Statistics by Sex")
+```
+Table 2 presents the same descriptive statistics stratified by sex, allowing for comparisons between boys and girls.
+
+```{r, load table 3, echo=FALSE}
+summary_by_depression <- readRDS(
+  here::here("tables/summary_by_depression.rds")
+)
+knitr::kable(
+  summary_by_depression,
+  caption = "Table 3. Descriptive Statistics by Depression Status")
+```
+Table 3 presents descriptive statistics stratified by depression status. It compares estimated leisure screen time, sleep quality, and average sleep duration between participants classified as depressed and not depressed.
+
+## Figures
+```{r, load figure 1, echo=FALSE, message=FALSE, warning=FALSE}
+#| fig.align = "center",
+#| out.width = "600px"
+knitr::include_graphics(
+  here::here("figures/Figure 1.png")
+)
+
+```
+
+
+Figure 1 displays the relationship between estimated leisure screen time and BDI-II depression scores.
+```{r, load figure 2, echo=FALSE, message=FALSE, warning=FALSE}
+#| fig.align = "center",
+#| out.width = "600px"
+knitr::include_graphics(
+  here::here("figures/Figure 2.png")
+)
+```
+
+
+Figure 2 compares estimated leisure screen time between participants classified as depressed and not depressed.
+
+```{r figure 3, echo=FALSE, message=FALSE, warning=FALSE}
+#| fig.align = "center",
+#| out.width = "600px"
+knitr::include_graphics(
+  here::here("figures/Figure 3.png")
+)
+```
+
+
+Figure 3 examines the relationship between average sleep duration and BDI-II depression scores. 
+
+```{r, load figure 4, echo=FALSE, message=FALSE, warning=FALSE}
+#| fig.align = "center",
+#| out.width = "600px"
+knitr::include_graphics(
+  here::here("figures/Figure 4.png")
+)
+```
+
+
+Figure 4 examines the relationship between sleep quality and BDI-II depression scores. 
